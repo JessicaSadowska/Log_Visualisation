@@ -1,0 +1,8 @@
+this is gonna be an awesome app
+
+<form method="POST" enctype="multipart/form-data" id="inputform" name="form1" class="dropzone">
+   {% csrf_token %}
+    <h4>Drop</h4>
+    <input type="file" name="uploaded_file">
+    <button type="submit" id="add">Save</button>
+  </form>
