@@ -2,6 +2,8 @@ import codecs
 
 from django.shortcuts import render
 from django.views import View
+import ocel
+from django.core.files.storage import FileSystemStorage
 
 
 class Home(View):
@@ -10,12 +12,10 @@ class Home(View):
 
     def post(self, request):
         file = request.FILES['uploaded_file']
-        text = file.read()
-        # fs = FileSystemStorage(location="ciscotest/uploadedmedia")
-        # filename = fs.save(myfile.name, myfile)
-        # uploaded_file_url = fs.url(filename)
-        # f = codecs.open(file, encoding='utf-8')
-        # data = f.read()
+        fs = FileSystemStorage(location="ciscotest/uploadedmedia")
+        file = fs.save(file.name, file)
+        log = ocel.import_log("ciscotest/uploadedmedia/" + file)
+        text = ocel.get_events(log)
         context = {
             'data': text,
         }
