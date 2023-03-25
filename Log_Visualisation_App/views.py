@@ -15,10 +15,26 @@ class Home(View):
         fs = FileSystemStorage(location="ciscotest/uploadedmedia")
         file = fs.save(file.name, file)
         log = ocel.import_log("ciscotest/uploadedmedia/" + file)
-        text = ocel.get_events(log)
+        ocel_log = OcelLog(log)
+
         context = {
-            'data': text,
+            'data': ocel_log.get_events(),
+            'objects_count': ocel_log.objects_count(),
+            'objects': ocel_log.get_objects(),
         }
         return render(request, 'uploaded.html', context)
+    
 
+class OcelLog:
+    def __init__(self, log):
+        self.log = log
 
+    def get_events(self):
+        return ocel.get_events(self.log)
+
+    def get_objects(self):
+        return ocel.get_objects(self.log)
+
+    def objects_count(self):
+        return len(ocel.get_objects(self.log))
+    

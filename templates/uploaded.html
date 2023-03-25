@@ -1,1 +1,43 @@
-{{ data }}
+{% extends "home.html" %}
+{% load static %}
+{% block content %}
+
+<div class="search_objects">
+    <h3>Szukaj logów z zadanym obiektem</h3>
+    <form action="/searchObjects" method="POST">
+        <p> Wybierz object*
+            <input list="brow" id="object" name="object" autocomplete="off">
+            <datalist id="brow">
+                {% for object in objects %}
+                    <option value="{{object}}">
+                {% endfor %}
+            </datalist> 
+        </p>
+        <p></p><input type="submit" value="Szukaj">
+    </form>
+</div>
+
+
+<div>
+    <h3>Liczba obiektow w eventach: {{objects_count}}</h3>
+</div>
+
+<div>
+    <h3>Logi:</h3>
+</div>
+
+<div id = "event_container" style="padding-bottom: 10px; float:left; width: 30%;">
+    {% for event, value in data.items %}
+        <table style="border: 1px solid grey; padding: 30px;  ">
+            <tr>                    
+                <pre>{{ event }}</pre>
+                <td class="db_cell"><h4><pre>{{ value }}</pre></h4></td>
+            </tr>
+        </table>
+    {% endfor %}
+
+</div>
+
+
+
+{% endblock content %}
