@@ -19,14 +19,87 @@
 
 
 <div>
-    <h3>Liczba obiektow w eventach: {{objects_count}}</h3>
+    <h3>Liczba różnych obiektow w logach</h3>
+    <h3 id="object_count">{{objects_count}}</h3>
+</div>
+
+<button id="init" onclick="init('{{objects_count}}')">RYSUJ</button>
+
+<canvas style = "border: 1px solid black; background-color: rgb(234, 234, 234);" id="canvas"></canvas>
+
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext('2d');
+var wrapper = canvas.parentNode;
+canvas.style.display = "none";
+
+var event_n = "{{event_names_string | safe}}"
+
+function init(object_count) {
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext('2d');
+    var wrapper = canvas.parentNode;
+    canvas.style.display = "block";
+    canvas.style.border = "2px solid black"
+
+    canvas.setAttribute("width", window.getComputedStyle(wrapper).width);
+    canvas.setAttribute("height", window.getComputedStyle(wrapper).height);
+  
+    var max = object_count;
+    var rectWidth = 150;
+    var rectHeight = 100;
+    canvas.setAttribute("width", (max) * rectWidth + "px");
+    canvas.setAttribute("height", (max) * rectHeight + "px");
+
+    alert(event_n);
+
+    var x = 20;
+    var y = 20;
+    var size_x = 100;
+    var size_y = 100;
+    var text_x = 85;
+    var text_y = 60;
+    var events = event_n.split(',');
+    for (i in events) {
+        draw_circle(x, y, size_x, size_y, text_x, text_y, events[i]);
+        x = x + size_x;
+        text_x = text_x + size_x;
+    }
+}
+
+function draw_circle(x, y, size_x, size_y, text_x, text_y, text) {
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext('2d');
+
+    ctx.beginPath();
+    ctx.rect(x, y, size_x, size_y);
+    ctx.font = "20px Arial";
+    ctx.fillText(text, text_x, text_y)
+    ctx.stroke();
+}
+    
+</script>
+
+
+<div>
+    <h3>Eventy:</h3>
+</div>
+<div id = "event_container" style="padding-bottom: 10px; width: 30%;">
+    {% for event_name in event_names_array %}
+        <table style="border: 1px solid grey; padding: 10px;  ">
+            <th>                    
+                <td class="db_cell"><h4><pre>{{ event_name }}</pre></h4></td>
+            </th>
+        </table>
+    {% endfor %}
+
 </div>
 
 <div>
     <h3>Logi:</h3>
 </div>
 
-<div id = "event_container" style="padding-bottom: 10px; float:left; width: 30%;">
+<div id = "event_container" style="padding-bottom: 10px; width: 30%;">
     {% for event, value in data.items %}
         <table style="border: 1px solid grey; padding: 30px;  ">
             <tr>                    
@@ -37,7 +110,5 @@
     {% endfor %}
 
 </div>
-
-
 
 {% endblock content %}
