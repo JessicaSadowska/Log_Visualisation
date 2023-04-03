@@ -3,10 +3,9 @@ import codecs
 from django.shortcuts import render
 from django.views import View
 import ocel
-import json
 from django.core.files.storage import FileSystemStorage
 # from .forms import ObjectForm
-from Log_Visualisation_App.models import OcelLog
+from Log_Visualisation_App.models import OcelLog, Event, LogObject
 
 
 class Home(View):
@@ -21,14 +20,28 @@ class Home(View):
         log = OcelLog(log=ocel_log)
         log.save()
 
+        events = ocel.get_events(ocel_log)
+        for event, value in events.items():
+            e = Event(ocel_log=log, event_name=event, event_value=value)
+            e.save()
+        set_of_events = log.event_set.all()
+
+        log_objects = ocel.get_objects(ocel_log)
+        for obj in log_objects:
+            o = LogObject(ocel_log=log, object_name=obj)
+            o.save()
+        set_of_objects = log.logobject_set.all()
+
+        log.events_count = len(events)
+        log.objects_count = len(log_objects)
+        log.save()
+
         context = {
+            'events': set_of_events,
+            'objects': set_of_objects,
             'log': log,
-            'data': log.get_events(),
-            'objects_count': log.objects_count(),
-            'objects': log.get_objects(),
-            'event_names_string': log.get_events_names_string(),
-            'event_names_array': log.get_events_names_array(),
-            'events_count': log.events_count(),
+            'data': events,
+            # 'objects': log.get_objects(),
         }
         return render(request, 'uploaded.html', context)
 
@@ -36,10 +49,11 @@ class Home(View):
 class UploadedLogsWithObject(View):
     def post(self, request, log_id):
         log = OcelLog.objects.get(id=log_id)
-        obj = request.POST['object']
+        object_name = request.POST['object']
+        log_object = LogObject.objects.get(ocel_log=log, object_name=object_name)
 
         context = {
-            'object': obj,
+            'object': log_object,
             'log': log,
             # 'data': log.get_events(),
             # 'objects_count': log.objects_count(),
@@ -51,7 +65,23 @@ class UploadedLogsWithObject(View):
         return render(request, 'uploaded_logs_with_object.html', context)
 
 
+class UploadedLogsWithEventName(View):
+    def post(self, request, log_id):
+        log = OcelLog.objects.get(id=log_id)
+        event_name = request.POST['event']
+        event = Event.objects.get(ocel_log=log, event_name=event_name)
 
+        context = {
+            'event': event,
+            'log': log,
+            # 'data': log.get_events(),
+            # 'objects_count': log.objects_count(),
+            # 'objects': log.get_objects(),
+            # 'event_names_string': log.get_events_names_string(),
+            # 'event_names_array': log.get_events_names_array(),
+            # 'events_count': log.events_count(),
+        }
+        return render(request, 'uploaded_logs_with_event_name.html', context)
 
 
 

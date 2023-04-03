@@ -2,29 +2,40 @@
 {% load static %}
 {% block content %}
 
+
    <div class="container mt-5" style="min-height: 590px">
       <div class="row">
-        <div class="col-6">
+        <div class="col-6 px-3">
 
-          <div class="mb-4">
-            <h3 class="text-uppercase fw-normal text-dark">Liczba eventów:</h3>
-            <h3 id="object_count">{{events_count}}</h3>
+          <h3 class="text-uppercase fw-normal text-dark">Eventy:</h3>
+
+
+              <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
+                  <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
+                    {% for event in events %}
+                        <a href="/#log_{{ event.event_name }}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">{{ event.event_name }}</a>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+
+          <div class="my-4">
+            <h4 class="text-uppercase fw-normal text-dark">Liczba eventów:</h4>
+            <h3 id="object_count">{{ log.events_count }}</h3>
           </div>
 
-          <div class="mb-4">
-            <h3 class="text-uppercase fw-normal text-dark">Liczba unikalnych obiektów w logach:</h3>
-            <h3 id="object_count">{{objects_count}}</h3>
-          </div>
 
-            <div class="search_objects mb-4">
-                <h3 class="text-uppercase fw-normal text-dark">Wyszukaj logi z zadanym obiektem</h3>
-                <form action="{% url 'UploadedLogsWithObject' log.id %}" method="POST">
+          <div class="search_objects mb-4">
+                <h4 class="text-uppercase fw-normal text-dark">Wyszukaj log po nazwie eventu</h4>
+                <form action="{% url 'UploadedLogsWithEventName' log.id %}" method="POST">
                 {% csrf_token %}
                     <p> Wybierz obiekt:
-                        <input list="brow" id="object" name="object" autocomplete="off">
-                        <datalist id="brow">
-                            {% for object in objects %}
-                                <option value="{{object}}">
+                        <input list="brow1" id="event" name="event" autocomplete="off">
+                        <datalist id="brow1">
+                            {% for event in events %}
+                                <option value="{{event.event_name}}">
                             {% endfor %}
                         </datalist>
                     </p>
@@ -32,22 +43,45 @@
                 </form>
             </div>
 
+
+
         </div>
 
 
-        <div class="col-6">
-          <h3 class="text-uppercase fw-normal text-dark">Eventy:</h3>
+        <div class="col-6 px-3">
+          <h3 class="text-uppercase fw-normal text-dark">Obiekty:</h3>
 
 
               <div class="modal-dialog" role="document">
                 <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
                   <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
-                    {% for event_name in event_names_array %}
-                        <a href="/#log_{{ event_name }}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">{{ event_name }}</a>
+                    {% for object in objects %}
+                        <a href="/#log_{{ object.object_name }}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">{{ object.object_name }}</a>
                     {% endfor %}
                   </div>
                 </div>
               </div>
+
+          <div class="my-4">
+            <h4 class="text-uppercase fw-normal text-dark">Liczba unikalnych obiektów w logach:</h4>
+            <h3 id="object_count">{{ log.objects_count }}</h3>
+          </div>
+
+          <div class="search_objects mb-4">
+                <h4 class="text-uppercase fw-normal text-dark">Wyszukaj logi z zadanym obiektem</h4>
+                <form action="{% url 'UploadedLogsWithObject' log.id %}" method="POST">
+                {% csrf_token %}
+                    <p> Wybierz obiekt:
+                        <input list="brow2" id="object" name="object" autocomplete="off">
+                        <datalist id="brow2">
+                            {% for object in objects %}
+                                <option value="{{object.object_name}}">
+                            {% endfor %}
+                        </datalist>
+                    </p>
+                    <p></p><input class="btn btn-light" type="submit" value="Szukaj">
+                </form>
+            </div>
 
 
         </div>
