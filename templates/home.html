@@ -1,24 +1,14 @@
-this is gonna be an awesome app
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
 
-<!doctype html>
-<head>
-    <meta charset="utf-8">
-
-<form method="POST" enctype="multipart/form-data" id="inputform" name="form1" class="dropzone">
-   {% csrf_token %}
-    <h4>Drop</h4>
-    <input type="file" name="uploaded_file">
-    <button type="submit" id="add">Save</button>
-  </form>
-
-</head>
-
-
-<body>
-    <div class=main>
-        {% block content %}
-
-        {% endblock %}
+    <div class="container mt-5" style="min-height: 590px">
+        <form action="{% url 'Home' %}" method="POST" enctype="multipart/form-data" id="inputform" name="form1" class="dropzone">
+            {% csrf_token %}
+            <h4>Wybierz plik w formacie 'jsonocel', który chcesz załadować:</h4>
+            <input type="file" name="uploaded_file">
+            <button class="btn btn-light" type="submit" id="add">Zatwierdź</button>
+        </form>
     </div>
-    
-</body>
+
+{% endblock %}

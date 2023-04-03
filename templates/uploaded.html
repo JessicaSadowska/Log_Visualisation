@@ -1,114 +1,229 @@
-{% extends "home.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block content %}
 
-<div class="search_objects">
-    <h3>Szukaj logów z zadanym obiektem</h3>
-    <form action="/searchObjects" method="POST">
-        <p> Wybierz object*
-            <input list="brow" id="object" name="object" autocomplete="off">
-            <datalist id="brow">
-                {% for object in objects %}
-                    <option value="{{object}}">
-                {% endfor %}
-            </datalist> 
-        </p>
-        <p></p><input type="submit" value="Szukaj">
-    </form>
-</div>
+   <div class="container mt-5" style="min-height: 590px">
+      <div class="row">
+        <div class="col-6">
+
+          <div class="mb-4">
+            <h3 class="text-uppercase fw-normal text-dark">Liczba eventów:</h3>
+            <h3 id="object_count">{{events_count}}</h3>
+          </div>
+
+          <div class="mb-4">
+            <h3 class="text-uppercase fw-normal text-dark">Liczba unikalnych obiektów w logach:</h3>
+            <h3 id="object_count">{{objects_count}}</h3>
+          </div>
+
+            <div class="search_objects mb-4">
+                <h3 class="text-uppercase fw-normal text-dark">Wyszukaj logi z zadanym obiektem</h3>
+                <form action="{% url 'UploadedLogsWithObject' log.id %}" method="POST">
+                {% csrf_token %}
+                    <p> Wybierz obiekt:
+                        <input list="brow" id="object" name="object" autocomplete="off">
+                        <datalist id="brow">
+                            {% for object in objects %}
+                                <option value="{{object}}">
+                            {% endfor %}
+                        </datalist>
+                    </p>
+                    <p></p><input class="btn btn-light" type="submit" value="Szukaj">
+                </form>
+            </div>
+
+        </div>
 
 
-<div>
-    <h3>Liczba różnych obiektow w logach</h3>
-    <h3 id="object_count">{{objects_count}}</h3>
-</div>
-
-<button id="init" onclick="init('{{objects_count}}')">RYSUJ</button>
-
-<canvas style = "border: 1px solid black; background-color: rgb(234, 234, 234);" id="canvas"></canvas>
-
-<script>
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext('2d');
-var wrapper = canvas.parentNode;
-canvas.style.display = "none";
-
-var event_n = "{{event_names_string | safe}}"
-
-function init(object_count) {
-    var canvas = document.getElementById("canvas");
-    var ctx = canvas.getContext('2d');
-    var wrapper = canvas.parentNode;
-    canvas.style.display = "block";
-    canvas.style.border = "2px solid black"
-
-    canvas.setAttribute("width", window.getComputedStyle(wrapper).width);
-    canvas.setAttribute("height", window.getComputedStyle(wrapper).height);
-  
-    var max = object_count;
-    var rectWidth = 150;
-    var rectHeight = 100;
-    canvas.setAttribute("width", (max) * rectWidth + "px");
-    canvas.setAttribute("height", (max) * rectHeight + "px");
-
-    alert(event_n);
-
-    var x = 20;
-    var y = 20;
-    var size_x = 100;
-    var size_y = 100;
-    var text_x = 85;
-    var text_y = 60;
-    var events = event_n.split(',');
-    for (i in events) {
-        draw_circle(x, y, size_x, size_y, text_x, text_y, events[i]);
-        x = x + size_x;
-        text_x = text_x + size_x;
-    }
-}
-
-function draw_circle(x, y, size_x, size_y, text_x, text_y, text) {
-    var canvas = document.getElementById("canvas");
-    var ctx = canvas.getContext('2d');
-
-    ctx.beginPath();
-    ctx.rect(x, y, size_x, size_y);
-    ctx.font = "20px Arial";
-    ctx.fillText(text, text_x, text_y)
-    ctx.stroke();
-}
-    
-</script>
+        <div class="col-6">
+          <h3 class="text-uppercase fw-normal text-dark">Eventy:</h3>
 
 
-<div>
-    <h3>Eventy:</h3>
-</div>
-<div id = "event_container" style="padding-bottom: 10px; width: 30%;">
-    {% for event_name in event_names_array %}
-        <table style="border: 1px solid grey; padding: 10px;  ">
-            <th>                    
-                <td class="db_cell"><h4><pre>{{ event_name }}</pre></h4></td>
-            </th>
-        </table>
-    {% endfor %}
+              <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
+                  <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
+                    {% for event_name in event_names_array %}
+                        <a href="/#log_{{ event_name }}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">{{ event_name }}</a>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
 
-</div>
 
-<div>
-    <h3>Logi:</h3>
-</div>
+        </div>
+      </div>
 
-<div id = "event_container" style="padding-bottom: 10px; width: 30%;">
-    {% for event, value in data.items %}
-        <table style="border: 1px solid grey; padding: 30px;  ">
-            <tr>                    
-                <pre>{{ event }}</pre>
-                <td class="db_cell"><h4><pre>{{ value }}</pre></h4></td>
-            </tr>
-        </table>
-    {% endfor %}
+      {% block logi %}
+      <div class="mt-4 border-top">
+          <h3 class="text-uppercase fw-normal text-dark mt-4">Logi:</h3>
+          <ul class="list-unstyled">
+          {% for event, value in data.items %}
+                <li>
+                    <h4>{{ event }}</h4>
+                    <ul>
+                    {% for key, val in value.items %}
+                        <li id="log_{{ event }}">
+                            <p><span class="fw-bold">{{ key }}</span>: {{ val }}</p>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </li>
+          {% endfor %}
+          </ul>
+      </div>
+   </div>
+   {% endblock %}
 
-</div>
+
+
+
+
 
 {% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{#    <div class="container">#}
+{#        <div class="search_objects">#}
+{#            <h3>Szukaj logów z zadanym obiektem</h3>#}
+{#            <form action="/searchObjects" method="POST">#}
+{#                <p> Wybierz object*#}
+{#                    <input list="brow" id="object" name="object" autocomplete="off">#}
+{#                    <datalist id="brow">#}
+{#                        {% for object in objects %}#}
+{#                            <option value="{{object}}">#}
+{#                        {% endfor %}#}
+{#                    </datalist>#}
+{#                </p>#}
+{#                <p></p><input type="submit" value="Szukaj">#}
+{#            </form>#}
+{#        </div>#}
+{##}
+{##}
+{#        <div>#}
+{#            <h3>Liczba różnych obiektow w logach</h3>#}
+{#            <h3 id="object_count">{{objects_count}}</h3>#}
+{#        </div>#}
+{##}
+{#        <button id="init" onclick="init('{{objects_count}}')">RYSUJ</button>#}
+{##}
+{#        <canvas style = "border: 1px solid black; background-color: rgb(234, 234, 234);" id="canvas"></canvas>#}
+{##}
+{##}
+{##}
+{##}
+{#        <div>#}
+{#            <h3>Eventy:</h3>#}
+{#        </div>#}
+{#        <div id = "event_container" style="padding-bottom: 10px; width: 30%;">#}
+{#            {% for event_name in event_names_array %}#}
+{#                <table style="border: 1px solid grey; padding: 10px;  ">#}
+{#                    <th>#}
+{#                        <td class="db_cell"><h4><pre>{{ event_name }}</pre></h4></td>#}
+{#                    </th>#}
+{#                </table>#}
+{#            {% endfor %}#}
+{##}
+{#        </div>#}
+{##}
+{#        <div>#}
+{#            <h3>Logi:</h3>#}
+{#        </div>#}
+{##}
+{#        <div id = "event_container" style="padding-bottom: 10px; width: 30%;">#}
+{#            {% for event, value in data.items %}#}
+{#                <table style="border: 1px solid grey; padding: 30px;  ">#}
+{#                    <tr>#}
+{#                        <pre>{{ event }}</pre>#}
+{#                        <td class="db_cell"><h4><pre>{{ value }}</pre></h4></td>#}
+{#                    </tr>#}
+{#                </table>#}
+{#            {% endfor %}#}
+{##}
+{#        </div>#}
+{##}
+{#        </div>#}
+
+
+{#<script>#}
+{#var canvas = document.getElementById("canvas");#}
+{#var ctx = canvas.getContext('2d');#}
+{#var wrapper = canvas.parentNode;#}
+{#canvas.style.display = "none";#}
+{##}
+{#var event_n = "{{event_names_string | safe}}"#}
+{##}
+{#function init(object_count) {#}
+{#    var canvas = document.getElementById("canvas");#}
+{#    var ctx = canvas.getContext('2d');#}
+{#    var wrapper = canvas.parentNode;#}
+{#    canvas.style.display = "block";#}
+{#    canvas.style.border = "2px solid black"#}
+{##}
+{#    canvas.setAttribute("width", window.getComputedStyle(wrapper).width);#}
+{#    canvas.setAttribute("height", window.getComputedStyle(wrapper).height);#}
+{##}
+{#    var max = object_count;#}
+{#    var rectWidth = 150;#}
+{#    var rectHeight = 100;#}
+{#    canvas.setAttribute("width", (max) * rectWidth + "px");#}
+{#    canvas.setAttribute("height", (max) * rectHeight + "px");#}
+{##}
+{#    alert(event_n);#}
+{##}
+{#    var x = 20;#}
+{#    var y = 20;#}
+{#    var size_x = 100;#}
+{#    var size_y = 100;#}
+{#    var text_x = 85;#}
+{#    var text_y = 60;#}
+{#    var events = event_n.split(',');#}
+{#    for (i in events) {#}
+{#        draw_circle(x, y, size_x, size_y, text_x, text_y, events[i]);#}
+{#        x = x + size_x;#}
+{#        text_x = text_x + size_x;#}
+{#    }#}
+{#}#}
+{##}
+{#function draw_circle(x, y, size_x, size_y, text_x, text_y, text) {#}
+{#    var canvas = document.getElementById("canvas");#}
+{#    var ctx = canvas.getContext('2d');#}
+{##}
+{#    ctx.beginPath();#}
+{#    ctx.rect(x, y, size_x, size_y);#}
+{#    ctx.font = "20px Arial";#}
+{#    ctx.fillText(text, text_x, text_y)#}
+{#    ctx.stroke();#}
+{#}#}
+{##}
+{#</script>#}
+
+
+
