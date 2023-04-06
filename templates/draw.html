@@ -1,0 +1,47 @@
+{% extends "home.html" %}
+{% load static %}
+{% block content %}
+    <div class="container mt-5" style="min-height: 590px">
+
+
+    {% for event in events %}
+        <div class="d-inline-block bg-light rounded-4 m-2 p-3 border">
+            <h5>Event: {{ event.name }}</h5>
+            <ul>
+                {% for object in event.event_objects.all %}
+                    <li>{{ object.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+
+
+    <div class="row">
+        <div class="bg-secondary border-top border-bottom my-1 py-2">
+            <div class="d-inline-block text-center text-dark bg-light rounded-2" style="width: 100px">Event:</div>
+                {% for event in events %}
+                    <div class="d-inline-block text-center text-dark bg-light rounded-circle mx-3" style="width: 25px">{{ event.name }}</div>
+                {% endfor %}
+        </div>
+        {% for row in data %}
+            <div class="bg-light border-top border-bottom my-1 py-2">
+                {% for key, val in row.items %}
+                <div class="d-inline-block text-center text-white bg-secondary rounded-2" style="width: 100px">{{ key }}</div>
+                    {% for item in val %}
+                        {% if item == 1 %}
+                            <div class="d-inline-block text-center text-warning bg-warning rounded-circle mx-3" style="width: 25px">.</div>
+                        {% elif item == 0 %}
+                            <div class="d-inline-block text-center text-light bg-light rounded-circle mx-3" style="width: 25px">.</div>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+
+            </div>
+        {% endfor %}
+    </div>
+
+
+
+    </div>
+{% endblock %}
+

@@ -126,7 +126,29 @@ class LogsWithObjectType(View):
         return render(request, 'uploaded_logs_with_object_type.html', context)
 
 
+class Draw(View):
+    def get(self, request, log_id):
+        log = OcelLog.objects.get(id=log_id)
+        events = log.event_set.all()
+        objects = log.logobject_set.all()
 
+        ordered_events = events.order_by('timestamp')
+        data = []
+
+        for obj in objects:
+            row = []
+            for event in ordered_events:
+                if obj in event.event_objects.all():
+                    row.append(1)
+                else:
+                    row.append(0)
+            data.append({obj.name: row})
+
+        context = {
+            "events": ordered_events,
+            "data": data,
+        }
+        return render(request, 'draw.html', context=context)
 
 
 
