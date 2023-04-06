@@ -65,29 +65,14 @@ class Home(View):
         return render(request, 'uploaded.html', context)
 
 
-
-
-
-
-
-
-
-
 class LogsWithEventName(View):
     def post(self, request, log_id):
         log = OcelLog.objects.get(id=log_id)
         event_name = request.POST['event']
-        event = Event.objects.get(ocel_log=log, event_name=event_name)
+        event = Event.objects.get(ocel_log=log, name=event_name)
 
         context = {
-            'event': event,
-            'log': log,
-            # 'data': log.get_events(),
-            # 'objects_count': log.objects_count(),
-            # 'objects': log.get_objects(),
-            # 'event_names_string': log.get_events_names_string(),
-            # 'event_names_array': log.get_events_names_array(),
-            # 'events_count': log.events_count(),
+            'event': event
         }
         return render(request, 'uploaded_logs_with_event_name.html', context)
 
@@ -95,37 +80,26 @@ class LogsWithEventName(View):
 class LogsWithActivity(View):
     def post(self, request, log_id):
         log = OcelLog.objects.get(id=log_id)
-        event_name = request.POST['event']
-        event = Event.objects.get(ocel_log=log, event_name=event_name)
+        activity = request.POST['activity']
+        events = Event.objects.filter(ocel_log=log, activity=activity)
 
         context = {
-            'event': event,
-            'log': log,
-            # 'data': log.get_events(),
-            # 'objects_count': log.objects_count(),
-            # 'objects': log.get_objects(),
-            # 'event_names_string': log.get_events_names_string(),
-            # 'event_names_array': log.get_events_names_array(),
-            # 'events_count': log.events_count(),
+            "activity": activity,
+            "events": events,
         }
-        return render(request, 'uploaded_logs_with_event_name.html', context)
+        return render(request, 'uploaded_logs_with_activity.html', context)
 
 
 class LogsWithObject(View):
     def post(self, request, log_id):
         log = OcelLog.objects.get(id=log_id)
         object_name = request.POST['object']
-        log_object = LogObject.objects.get(ocel_log=log, object_name=object_name)
+        log_object = LogObject.objects.get(ocel_log=log, name=object_name)
+        events = log_object.events.all()
 
         context = {
-            'object': log_object,
-            'log': log,
-            # 'data': log.get_events(),
-            # 'objects_count': log.objects_count(),
-            # 'objects': log.get_objects(),
-            # 'event_names_string': log.get_events_names_string(),
-            # 'event_names_array': log.get_events_names_array(),
-            # 'events_count': log.events_count(),
+            "object": log_object,
+            "events": events,
         }
         return render(request, 'uploaded_logs_with_object.html', context)
 
@@ -133,20 +107,23 @@ class LogsWithObject(View):
 class LogsWithObjectType(View):
     def post(self, request, log_id):
         log = OcelLog.objects.get(id=log_id)
-        event_name = request.POST['event']
-        event = Event.objects.get(ocel_log=log, event_name=event_name)
+        object_type = request.POST['object_type']
+        log_objects = LogObject.objects.filter(ocel_log=log, type=object_type)
+
+        events = []
+
+        for obj in log_objects:
+            obj_events = obj.events.all()
+            for e in obj_events:
+                if e not in events:
+                    events.append(e)
 
         context = {
-            'event': event,
-            'log': log,
-            # 'data': log.get_events(),
-            # 'objects_count': log.objects_count(),
-            # 'objects': log.get_objects(),
-            # 'event_names_string': log.get_events_names_string(),
-            # 'event_names_array': log.get_events_names_array(),
-            # 'events_count': log.events_count(),
+            "object_type": object_type,
+            "objects": log_objects,
+            "events": events,
         }
-        return render(request, 'uploaded_logs_with_event_name.html', context)
+        return render(request, 'uploaded_logs_with_object_type.html', context)
 
 
 

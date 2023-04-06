@@ -71,7 +71,7 @@
                 <form action="{% url 'LogsWithActivity' log.id %}" method="POST">
                 {% csrf_token %}
                     <p> Wybierz obiekt:
-                        <input list="brow2" id="object" name="object" autocomplete="off">
+                        <input list="brow2" id="activity" name="activity" autocomplete="off">
                         <datalist id="brow2">
                             {% for activity in log.activities %}
                                 <option value="{{activity}}">
@@ -149,7 +149,7 @@
                 <form action="{% url 'LogsWithObjectType' log.id %}" method="POST">
                 {% csrf_token %}
                     <p> Wybierz obiekt:
-                        <input list="brow4" id="object" name="object" autocomplete="off">
+                        <input list="brow4" id="object_type" name="object_type" autocomplete="off">
                         <datalist id="brow4">
                             {% for type in log.object_types %}
                                 <option value="{{type}}">
@@ -161,12 +161,21 @@
             </div>
           </div>
 {#------------------------------//TYPES---------------------------------#}
-
       </div>
 
-      {% block logi %}
-      <div class="mt-4 border-top">
-          <h3 class="text-uppercase fw-normal text-dark mt-4">Logi:</h3>
+
+{#------------------------------DRAW---------------------------------#}
+
+
+
+
+
+{#------------------------------//DRAW---------------------------------#}
+
+
+{#------------------------------LIST OF LOGS---------------------------------#}
+   <div class="mt-4 border-top">
+       <h3 class="text-uppercase fw-normal text-dark mt-4">Logi:</h3>
           <ul class="list-unstyled">
           {% for event in events %}
                 <li class="bg-light rounded-4 p-3 m-3">
@@ -210,21 +219,17 @@
                     </div>
                     </ul>
 
-
-
-
                 </li>
           {% endfor %}
           </ul>
       </div>
-   </div>
-   {% endblock %}
+{#------------------------------//LIST OF LOGS---------------------------------#}
 
 
 
 
 
-
+</div>
 {% endblock content %}
 
 

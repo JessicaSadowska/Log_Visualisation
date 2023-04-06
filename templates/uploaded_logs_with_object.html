@@ -3,8 +3,54 @@
 {% block content %}
 
     <div class="container mt-5" style="min-height: 590px">
-        <h3 class="text-uppercase fw-normal text-dark">Znaleziono:</h3>
-        <h4>{{ object.object_name }}</h4>
+        <h3 class="text-uppercase fw-normal text-dark">Z obiektem <span class="fw-bold">{{ object.name }}</span> znaleziono:</h3>
+
+          <ul class="list-unstyled">
+          {% for event in events %}
+                <li class="bg-light rounded-4 p-3 m-3">
+                    <h4 class="bg-secondary text-white rounded-2 text-center py-1 mb-3">{{ event.name }}</h4>
+
+                    <ul>
+                    <div class="row">
+
+
+                        <div class="col-4">
+                            <li>
+                                <p><span class="fw-bold">activity</span>: {{ event.activity }}</p>
+                            </li>
+                            <li>
+                                <p><span class="fw-bold">timestamp</span>: {{ event.timestamp }}</p>
+                            </li>
+                        </div>
+                        <div class="col-4">
+                            <li>
+                                <p><span class="fw-bold">omap</span>:
+                                    <ul>
+                                    {% for object in event.event_objects.all %}
+                                        <li>{{ object.name }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </p>
+                            </li>
+                        </div>
+                        <div class="col-4">
+                            <li>
+                                <p><span class="fw-bold">vmap</span>:
+                                    <ul>
+                                    {% for key, val in event.vmap.items %}
+                                        <li><span class="fw-bolder">{{ key }}</span>: {{ val }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </p>
+                            </li>
+                        </div>
+
+                    </div>
+                    </ul>
+
+                </li>
+          {% endfor %}
+          </ul>
 
     </div>
 

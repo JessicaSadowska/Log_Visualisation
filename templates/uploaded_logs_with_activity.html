@@ -3,12 +3,16 @@
 {% block content %}
 
     <div class="container mt-5" style="min-height: 590px">
-        <h3 class="text-uppercase fw-normal text-dark">Znaleziono:</h3>
-            <div class="bg-light rounded-4 p-3 m-3">
+        <h3 class="text-uppercase fw-normal text-dark">Z aktywnością <span class="fw-bold">{{ activity }}</span> znaleziono:</h3>
+
+          <ul class="list-unstyled">
+          {% for event in events %}
+                <li class="bg-light rounded-4 p-3 m-3">
                     <h4 class="bg-secondary text-white rounded-2 text-center py-1 mb-3">{{ event.name }}</h4>
 
                     <ul>
                     <div class="row">
+
 
                         <div class="col-4">
                             <li>
@@ -43,7 +47,10 @@
 
                     </div>
                     </ul>
-             </div>
+
+                </li>
+          {% endfor %}
+          </ul>
 
     </div>
 
