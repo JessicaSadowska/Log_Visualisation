@@ -3,25 +3,27 @@ from django.db import models
 
 
 class OcelLog(models.Model):
-    log = models.TextField()
     events_count = models.IntegerField(null=True)
     objects_count = models.IntegerField(null=True)
-
-    def get_events_names_string(self):
-        events = ocel.get_events(self.log)
-        return ', '.join(list(events.keys()))
-
-    def get_events_names_array(self):
-        events = ocel.get_events(self.log)
-        return list(events.keys())
-
-
-class Event(models.Model):
-    ocel_log = models.ForeignKey(OcelLog, on_delete=models.CASCADE)
-    event_name = models.CharField(max_length=255)
-    event_value = models.TextField()
+    object_types = models.JSONField(null=True)
+    attribute_names = models.JSONField(null=True)
+    activities = models.JSONField(null=True)
 
 
 class LogObject(models.Model):
     ocel_log = models.ForeignKey(OcelLog, on_delete=models.CASCADE)
-    object_name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
+    ovmap = models.TextField(null=True)
+
+
+class Event(models.Model):
+    ocel_log = models.ForeignKey(OcelLog, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    activity = models.CharField(max_length=255)
+    timestamp = models.DateTimeField()
+    event_objects = models.ManyToManyField(LogObject, related_name="events")
+    vmap = models.JSONField(null=True)
+
+
+

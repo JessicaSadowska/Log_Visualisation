@@ -8,7 +8,9 @@ from Log_Visualisation_App.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', Home.as_view(), name='Home'),
-    path('uploaded-logs-with-object/<int:log_id>/', UploadedLogsWithObject.as_view(), name='UploadedLogsWithObject'),
-    path('uploaded-logs-with-event-name/<int:log_id>/', UploadedLogsWithEventName.as_view(), name='UploadedLogsWithEventName')
+    path('logs-with-event-name/<int:log_id>/', LogsWithEventName.as_view(), name='LogsWithEventName'),
+    path('logs-with-activity/<int:log_id>/', LogsWithActivity.as_view(), name='LogsWithActivity'),
+    path('logs-with-object/<int:log_id>/', LogsWithObject.as_view(), name='LogsWithObject'),
+    path('logs-with-object-type/<int:log_id>/', LogsWithObjectType.as_view(), name='LogsWithObjectType'),
 ]
 
