@@ -1,10 +1,7 @@
-import codecs
-
 from django.shortcuts import render
 from django.views import View
 import ocel
 from django.core.files.storage import FileSystemStorage
-# from .forms import ObjectForm
 from Log_Visualisation_App.models import OcelLog, Event, LogObject
 
 
@@ -46,7 +43,6 @@ class Home(View):
                 activities.append(value['ocel:activity'])
 
             for obj in value['ocel:omap']:
-                print(f"OBJECT NAME:", obj)
                 o = LogObject.objects.get(ocel_log=log, name=obj)
                 e.event_objects.add(o)
             e.save()

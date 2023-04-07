@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import ocel
 from django.db import models
 
@@ -21,7 +23,7 @@ class Event(models.Model):
     ocel_log = models.ForeignKey(OcelLog, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     activity = models.CharField(max_length=255)
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(default=datetime.now())
     event_objects = models.ManyToManyField(LogObject, related_name="events")
     vmap = models.JSONField(null=True)
 
