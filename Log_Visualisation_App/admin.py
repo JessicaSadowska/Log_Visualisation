@@ -1,3 +1,6 @@
 from django.contrib import admin
+from Log_Visualisation_App.models import OcelLog, Event, LogObject
 
-# Register your models here.
+admin.site.register(OcelLog)
+admin.site.register(Event)
+admin.site.register(LogObject)
