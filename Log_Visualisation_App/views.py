@@ -46,7 +46,6 @@ class Home(View):
                 activities.append(value['ocel:activity'])
 
             for obj in value['ocel:omap']:
-                print(f"OBJECT NAME:", obj)
                 o = LogObject.objects.get(ocel_log=log, name=obj)
                 e.event_objects.add(o)
             e.save()

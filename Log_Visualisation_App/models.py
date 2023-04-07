@@ -8,6 +8,7 @@ class OcelLog(models.Model):
     object_types = models.JSONField(null=True)
     attribute_names = models.JSONField(null=True)
     activities = models.JSONField(null=True)
+    activities_string = models.CharField(max_length=255)
 
 
 class LogObject(models.Model):
