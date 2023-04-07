@@ -1,0 +1,111 @@
+{% load static %}
+{% block content %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
+<div class="container">
+    <canvas id="canvas" style="width: 600px; float: left;"></canvas>
+    <canvas id="canvas2" style="width: 600px; margin-left: 620px;"></canvas>
+</div>
+
+
+<script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+
+    var objects_string = ["{% for event in events %}{% for object in event.event_objects.all %}{{ object.name }},{% endfor %}{% endfor %}"];
+    var objects_array = objects_string[0].split(',');
+    var activity_in_event = ["{% for event in events %} {{ event.activity}} ,{% endfor %}"];
+    var activities_array = activity_in_event[0].split(',');
+
+
+    var uniqueCount = new Set(objects_array).size;
+
+    var uniqueCount2 = {};
+
+    for (let i = 0; i < objects_array.length; i++) {
+        if (uniqueCount2[objects_array[i]]) {
+            uniqueCount2[objects_array[i]] += 1;
+        } else {
+            uniqueCount2[objects_array[i]] = 1;
+        }
+    }
+
+    var values = Object.keys(uniqueCount2).map(function(key){
+    return uniqueCount2[key];
+});
+
+    var keys = Object.keys(uniqueCount2);
+
+    var chart = new Chart(ctx, {
+      type: "line",
+        data: {
+        labels: keys,
+        datasets: [
+          {
+            label: "Liczba wystąpień obiektów",
+            backgroundColor: "rgb(255, 19, 232)",
+            borderColor: "rgb(255, 19, 232)",
+            data: values
+          }
+        ]
+      },
+    
+      // Configuration options go here
+      options: {
+        responsive:false,
+        maintainAspectRatio: false
+      }
+    });
+</script>
+
+<script>
+    var canvas = document.getElementById("canvas2");
+    var ctx = canvas.getContext("2d");
+
+    var objects_string = ["{% for event in events %}{% for object in event.event_objects.all %}{{ object.name }},{% endfor %}{% endfor %}"];
+    var objects_array = objects_string[0].split(',');
+    var activity_in_event = ["{% for event in events %} {{ event.activity}} ,{% endfor %}"];
+    var activities_array = activity_in_event[0].split(',');
+
+
+    var uniqueCount = new Set(activities_array).size;
+
+    var uniqueCount2 = {};
+
+    for (let i = 0; i < activities_array.length; i++) {
+        if (uniqueCount2[activities_array[i]]) {
+            uniqueCount2[activities_array[i]] += 1;
+        } else {
+            uniqueCount2[activities_array[i]] = 1;
+        }
+    }
+
+    var values = Object.keys(uniqueCount2).map(function(key){
+    return uniqueCount2[key];
+});
+
+    var keys = Object.keys(uniqueCount2);
+
+    var chart = new Chart(ctx, {
+      type: "line",
+        data: {
+        labels: keys,
+        datasets: [
+          {
+            label: "Liczba wystąpień aktywności",
+            backgroundColor: "rgb(255, 99, 132)",
+            borderColor: "rgb(255, 99, 132)",
+            data: values
+          }
+        ]
+      },
+    
+      // Configuration options go here
+      options: {
+        responsive:false,
+        maintainAspectRatio: false
+      }
+    });
+</script>
+{% endblock content %}
