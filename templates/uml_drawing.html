@@ -1,19 +1,20 @@
 {% load static %}
 {% block content %}
 
-   <script src="../static/bower_components/bower-webfontloader/webfont.js" >  </script> 
+   <script src="{% static '../static/bower_components/bower-webfontloader/webfont.js' %}" >  </script> 
 
-   <script src="../static/bower_components/snap.svg/dist/snap.svg-min.js" >   </script> 
+   <script src="{% static '../static/bower_components/snap.svg/dist/snap.svg-min.js'  %}" >   </script> 
 
-   <script src="../static/bower_components/underscore/underscore-min.js" >   </script> 
+   <script src="{% static '../static/bower_components/underscore/underscore-min.js' %}" >   </script> 
 
-   <script src="../static/bower_components/js-sequence-diagrams/dist/sequence-diagram-min.js" >   </script> 
+   <script src="{% static '../static/bower_components/js-sequence-diagrams/dist/sequence-diagram-min.js' %}" >   </script> 
 
    <div id="diagram"></div>
  <script>
 
     var objects_string = ["{% for event in events %}{% for object in event.event_objects.all %}-{{ object.name }}-{% endfor %},{% endfor %}"];
     var objects_array = objects_string[0].split(',');
+
     var activity_in_event = ["{% for event in events %} {{ event.activity}} ,{% endfor %}"];
     var activities_array = activity_in_event[0].split(',');
 
