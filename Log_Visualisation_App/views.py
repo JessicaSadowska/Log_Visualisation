@@ -1,11 +1,8 @@
-import base64
-import codecs
-
 from django.shortcuts import render
 from django.views import View
 import ocel
 from django.core.files.storage import FileSystemStorage
-# from .forms import ObjectForm
+import json
 from Log_Visualisation_App.models import OcelLog, Event, LogObject
 
 
@@ -66,48 +63,81 @@ class Home(View):
 
 
 class LogsWithEventName(View):
-    def post(self, request, log_id):
+    def get(self, request, log_id, event_name):
         log = OcelLog.objects.get(id=log_id)
-        event_name = request.POST['event']
         event = Event.objects.get(ocel_log=log, name=event_name)
 
         context = {
-            'event': event
+            'event': event,
+            'log': log,
         }
         return render(request, 'uploaded_logs_with_event_name.html', context)
 
+    # def post(self, request, log_id):
+    #     log = OcelLog.objects.get(id=log_id)
+    #     event_name = request.POST['event']
+    #     event = Event.objects.get(ocel_log=log, name=event_name)
+    #
+    #     context = {
+    #         'event': event
+    #     }
+    #     return render(request, 'uploaded_logs_with_event_name.html', context)
+
 
 class LogsWithActivity(View):
-    def post(self, request, log_id):
+    def get(self, request, log_id, activity):
         log = OcelLog.objects.get(id=log_id)
-        activity = request.POST['activity']
         events = Event.objects.filter(ocel_log=log, activity=activity)
 
         context = {
             "activity": activity,
             "events": events,
+            'log': log,
         }
         return render(request, 'uploaded_logs_with_activity.html', context)
 
+    # def post(self, request, log_id):
+    #     log = OcelLog.objects.get(id=log_id)
+    #     activity = request.POST['activity']
+    #     events = Event.objects.filter(ocel_log=log, activity=activity)
+    #
+    #     context = {
+    #         "activity": activity,
+    #         "events": events,
+    #     }
+    #     return render(request, 'uploaded_logs_with_activity.html', context)
+
 
 class LogsWithObject(View):
-    def post(self, request, log_id):
+    def get(self, request, log_id, object_id):
         log = OcelLog.objects.get(id=log_id)
-        object_name = request.POST['object']
-        log_object = LogObject.objects.get(ocel_log=log, name=object_name)
+        log_object = LogObject.objects.get(id=object_id, ocel_log=log)
         events = log_object.events.all()
 
         context = {
             "object": log_object,
             "events": events,
+            'log': log,
         }
         return render(request, 'uploaded_logs_with_object.html', context)
 
+    # def post(self, request, log_id):
+    #     log = OcelLog.objects.get(id=log_id)
+    #     object_name = request.POST['object']
+    #     log_object = LogObject.objects.get(ocel_log=log, name=object_name)
+    #     events = log_object.events.all()
+    #
+    #     context = {
+    #         "object": log_object,
+    #         "events": events,
+    #     }
+    #     return render(request, 'uploaded_logs_with_object.html', context)
+
 
 class LogsWithObjectType(View):
-    def post(self, request, log_id):
+    def get(self, request, log_id, object_type):
         log = OcelLog.objects.get(id=log_id)
-        object_type = request.POST['object_type']
+        object_type = object_type
         log_objects = LogObject.objects.filter(ocel_log=log, type=object_type)
 
         events = []
@@ -122,8 +152,29 @@ class LogsWithObjectType(View):
             "object_type": object_type,
             "objects": log_objects,
             "events": events,
+            'log': log,
         }
         return render(request, 'uploaded_logs_with_object_type.html', context)
+
+    # def post(self, request, log_id):
+    #     log = OcelLog.objects.get(id=log_id)
+    #     object_type = request.POST['object_type']
+    #     log_objects = LogObject.objects.filter(ocel_log=log, type=object_type)
+    #
+    #     events = []
+    #
+    #     for obj in log_objects:
+    #         obj_events = obj.events.all()
+    #         for e in obj_events:
+    #             if e not in events:
+    #                 events.append(e)
+    #
+    #     context = {
+    #         "object_type": object_type,
+    #         "objects": log_objects,
+    #         "events": events,
+    #     }
+    #     return render(request, 'uploaded_logs_with_object_type.html', context)
 
 
 class DrawTable(View):
@@ -149,9 +200,6 @@ class DrawTable(View):
             "data": data,
         }
         return render(request, 'draw.html', context=context)
-
-
-import json
 
 
 class DrawDependenciesOfObjects(View):
@@ -241,7 +289,79 @@ class DrawDependenciesOfObjects(View):
             "first_layer_objects": first_layer_objects_json,
             "second_layer_objects": second_layer_objects_json,
             "third_layer_objects": third_layer_objects_json,
-            "events_in_graph": events_in_graph
+            "events_in_graph": events_in_graph,
+            "log": log,
+            "objects": objects,
         }
 
         return render(request, 'draw_dependencies.html', context=context)
+
+
+class Statistics(View):
+    def get(self, request, log_id):
+        log = OcelLog.objects.get(id=log_id)
+        events = log.event_set.all()
+        objects = log.logobject_set.all()
+
+        context = {
+            'events': events,
+            'objects': objects,
+            'log': log,
+        }
+        return render(request, 'statistics.html', context)
+
+
+class Graphs(View):
+    def get(self, request, log_id):
+        log = OcelLog.objects.get(id=log_id)
+        events = log.event_set.all()
+        objects = log.logobject_set.all()
+
+        context = {
+            'events': events,
+            'objects': objects,
+            'log': log,
+        }
+        return render(request, 'graphs.html', context)
+
+
+class GraphsUploaded(View):
+    def get(self, request, log_id, object_id):
+        log = OcelLog.objects.get(id=log_id)
+        events = log.event_set.all()
+        objects = log.logobject_set.all()
+
+        context = {
+            'events': events,
+            'objects': objects,
+            'log': log,
+        }
+        return render(request, 'graphs_uploaded.html', context)
+
+
+class ListOfEvents(View):
+    def get(self, request, log_id):
+        log = OcelLog.objects.get(id=log_id)
+        events = log.event_set.all()
+        objects = log.logobject_set.all()
+
+        context = {
+            'events': events,
+            'objects': objects,
+            'log': log,
+        }
+        return render(request, 'list_of_events.html', context)
+
+
+class Search(View):
+    def get(self, request, log_id):
+        log = OcelLog.objects.get(id=log_id)
+        events = log.event_set.all()
+        objects = log.logobject_set.all()
+
+        context = {
+            'events': events,
+            'objects': objects,
+            'log': log,
+        }
+        return render(request, 'search.html', context)

@@ -1,0 +1,17 @@
+{% extends "graphs.html" %}
+{% load static %}
+{% block graphs %}
+
+     <div class="col-8 px-3">
+        <h3 class="text-uppercase fw-normal text-dark">Wybierz obiekt:</h3>
+
+
+        <div class="mt-4 border-top" style="text-align: center">
+
+            {% include 'draw_dependencies.html' %}
+
+        </div>
+
+    </div>
+
+{% endblock graphs %}

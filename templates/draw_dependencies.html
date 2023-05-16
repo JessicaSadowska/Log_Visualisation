@@ -1,4 +1,4 @@
-{% extends "home.html" %}
+{% extends "uploaded.html" %}
 {% load static %}
 {% block scripts %}
 
@@ -94,7 +94,6 @@
 {% block body %}
 <body onload="init()">
 
-
 <header class="p-3 mb-1 border-bottom bg-light">
     <div class="container">
       <div class="d-flex flex-wrap align-items-center justify-content-center">
@@ -103,12 +102,112 @@
     </div>
 </header>
 
+<nav class="navbar navbar-expand-lg navbar-light rounded border-bottom">
+    <div class="collapse navbar-collapse justify-content-md-center" id="navbarsExample10">
+      <ul class="navbar-nav">
+        <li class="nav-item active mx-3 text-uppercase">
+          <a class="nav-link" href="/">Załaduj</a>
+        </li>
+        <li class="nav-item active mx-3 text-uppercase">
+          <a class="nav-link" href="{% url 'Search' log.id %}">Wyszukaj</a>
+        </li>
+        <li class="nav-item active mx-3 text-uppercase">
+          <a class="nav-link" href="{% url 'ListOfEvents' log.id %}">Lista eventów</a>
+        </li>
+        <li class="nav-item active mx-3 text-uppercase">
+          <a class="nav-link" href="{% url 'Graphs' log.id %}">Grafy</a>
+        </li>
+        <li class="nav-item active mx-3 text-uppercase">
+          <a class="nav-link" href="{% url 'Statistics' log.id %}">Statystki</a>
+        </li>
+      </ul>
+    </div>
+</nav>
+
 
     <div class="container mt-3" style="min-height: 620px">
 
-        <div id="myDiagramDiv" style="width: 1290px; height: 480px; border: 1px solid black;">
+        <div class="row">
+
+        <div class="col-3 px-3">
+            <h3 class="text-uppercase fw-normal text-dark">Wybierz obiekt:</h3>
+
+            <div class="modal-dialog mb-4" role="document">
+                <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
+                      <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
+                        {% for object in objects %}
+                            <a href="{% url 'DrawDependenciesOfObjects' log.id object.id %}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">
+                                {{ object.name }}
+                            </a>
+                        {% endfor %}
+                      </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-9 px-3">
+
+
+
+              <div id="myDiagramDiv" style="width: 990px; height: 480px; border: 1px solid black;">
 
         </div>
+        <div>
+            <ul class="list-unstyled">
+          {% for event in events_in_graph %}
+                <li id="{{ event.name }}: {{ event.activity }}" class="event_modal bg-light rounded-4 py-3 ps-3 my-3 ms-3 d-none">
+                    <h4 class="bg-secondary text-white rounded-2 text-center py-1 mb-3">{{ event.name }}</h4>
+
+                    <ul>
+                    <div class="row">
+
+
+                        <div class="col-4">
+                            <li>
+                                <p><span class="fw-bold">activity</span>: {{ event.activity }}</p>
+                            </li>
+                            <li>
+                                <p><span class="fw-bold">timestamp</span>: {{ event.timestamp }}</p>
+                            </li>
+                        </div>
+                        <div class="col-4">
+                            <li>
+                                <p><span class="fw-bold">omap</span>:
+                                    <ul>
+                                    {% for object in event.event_objects.all %}
+                                        <li>{{ object.name }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </p>
+                            </li>
+                        </div>
+                        <div class="col-4">
+                            <li>
+                                <p><span class="fw-bold">vmap</span>:
+                                    <ul>
+                                    {% for key, val in event.vmap.items %}
+                                        <li><span class="fw-bolder">{{ key }}</span>: {{ val }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </p>
+                            </li>
+                        </div>
+
+                    </div>
+                    </ul>
+
+                </li>
+          {% endfor %}
+          </ul>
+        </div>
+
+
+
+
+        </div>
+
+
+    </div>
         <div>
             <ul class="list-unstyled">
           {% for event in events_in_graph %}

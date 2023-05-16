@@ -1,0 +1,93 @@
+{% extends "uploaded.html" %}
+{% load static %}
+{% block uploaded_content %}
+
+    <div class="container mt-5" style="min-height: 538px">
+
+<div class="container mt-5" style="min-height: 538px">
+      <div class="row">
+{#------------------------------EVENTS---------------------------------#}
+        <div class="col-3 px-3 border-start">
+
+          <h3 class="text-uppercase fw-normal text-dark">Wyszukaj log po nazwie eventu:</h3>
+
+
+              <div class="modal-dialog mb-4" role="document">
+                <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
+                  <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
+                    {% for event in events %}
+                        <a href="{% url 'LogsWithEventName' log.id event.name%}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">
+                            {{ event.name }}
+                        </a>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+        </div>
+{#------------------------------//EVENTS---------------------------------#}
+
+
+{#------------------------------ACTIVITIES---------------------------------#}
+        <div class="col-3 px-3 border-end">
+          <h3 class="text-uppercase fw-normal text-dark">Wyszukaj logi z wybraną aktywnością:</h3>
+
+
+              <div class="modal-dialog mb-4" role="document">
+                <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
+                  <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
+                    {% for activity in log.activities %}
+                        <a href="{% url 'LogsWithActivity' log.id activity%}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">
+                            {{ activity }}
+                        </a>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+          </div>
+{#------------------------------//ACTIVITIES---------------------------------#}
+
+
+{#------------------------------OBJECTS---------------------------------#}
+        <div class="col-3 px-3">
+          <h3 class="text-uppercase fw-normal text-dark">Wyszukaj logi z zadanym obiektem:</h3>
+
+
+              <div class="modal-dialog mb-4" role="document">
+                <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
+                  <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
+                    {% for object in objects %}
+                        <a href="{% url 'LogsWithObject' log.id object.id %}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">
+                            {{ object.name }}
+                        </a>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+        </div>
+{#------------------------------//OBJECTS---------------------------------#}
+
+
+{#------------------------------TYPES---------------------------------#}
+        <div class="col-3 px-3 border-end">
+          <h3 class="text-uppercase fw-normal text-dark">Wyszukaj logi z wybranym typem obiektu:</h3>
+
+
+              <div class="modal-dialog mb-4" role="document">
+                <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
+                  <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
+                    {% for type in log.object_types %}
+                        <a href="{% url 'LogsWithObjectType' log.id type %}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">
+                            {{ type }}
+                        </a>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+          </div>
+{#------------------------------//TYPES---------------------------------#}
+      </div>
+    </div>
+</div>
+
+
+{% endblock %}
