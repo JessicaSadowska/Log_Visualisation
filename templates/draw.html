@@ -3,20 +3,7 @@
 {% block content %}
     <div class="container mt-5" style="min-height: 590px">
 
-
-    {% for event in events %}
-        <div class="d-inline-block bg-light rounded-4 m-2 p-3 border">
-            <h5>Event: {{ event.name }}</h5>
-            <ul>
-                {% for object in event.event_objects.all %}
-                    <li>{{ object.name }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endfor %}
-
-
-    <div class="row">
+    <div class="row d-inline-block" style="width: 4000px; overflow-x: auto">
         <div class="bg-secondary border-top border-bottom my-1 py-2">
             <div class="d-inline-block text-center text-dark bg-light rounded-2" style="width: 100px">Event:</div>
                 {% for event in events %}

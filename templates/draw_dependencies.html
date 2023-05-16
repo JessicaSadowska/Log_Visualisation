@@ -1,0 +1,182 @@
+{% extends "home.html" %}
+{% load static %}
+{% block scripts %}
+
+    <script>
+        function init(){
+            var $ = go.GraphObject.make;
+            myDiagram = $(go.Diagram, "myDiagramDiv");
+
+            myDiagram.nodeTemplate =
+                $(go.Node, "Auto",
+                    $(go.Shape, "RoundedRectangle", {fill: "lightgrey"}),
+                    $(go.TextBlock, {margin: 8},
+                        new go.Binding("text").makeTwoWay()
+                    )
+                );
+
+
+            myDiagram.layout =
+                $(go.TreeLayout,
+                    {
+                       angle: 90
+                    }
+                );
+
+            function showModal(modal_id) {
+                const all_modals = document.getElementsByClassName("event_modal")
+                Array.from(all_modals).forEach((modal) => {
+                    modal.classList.remove('d-block');
+                    modal.classList.add('d-none');
+                });
+                const modal = document.getElementById(modal_id)
+                modal.classList.remove('d-none');
+                modal.classList.add('d-block');
+                }
+
+            myDiagram.addDiagramListener("ObjectSingleClicked",
+                e => {
+                  var part = e.subject.part;
+                  if (!(part instanceof go.Link)) {
+                      showModal(part.data.text);
+                  }
+                });
+
+            var nodeDataArray = []
+
+            const FirstLayerObjects = {{ first_layer_objects|safe }}
+
+            for (const o of FirstLayerObjects ){
+                  nodeDataArray.push({key: o, text: o, group:"{{event_with_desired_object.name}}"});
+                }
+            nodeDataArray.push({key: "{{event_with_desired_object.name}}", text: "{{event_with_desired_object.name}}: {{event_with_desired_object.activity}}", isGroup: true});
+
+            const SecondLayerObjects = {{ second_layer_objects|safe }}
+
+            for (const [key, value] of Object.entries(SecondLayerObjects)) {
+                for (const val of value[0]) {
+                    nodeDataArray.push({key: val+key, text: val, group: key});
+                    }
+                nodeDataArray.push({key: key, text: value[1], isGroup: true});
+                }
+
+            const ThirdLayerObjects = {{ third_layer_objects|safe }}
+            console.log(ThirdLayerObjects)
+
+            for (const [key, value] of Object.entries(ThirdLayerObjects)) {
+                for (const [k, val] of Object.entries(value)) {
+                    for (const v of val[0]) {
+                        nodeDataArray.push({key: v + k, text: v, group: k});
+                        }
+                    nodeDataArray.push({key: k, text: val[1], isGroup: true});
+                    }
+                }
+
+            var linkDataArray = []
+
+            for (const [key, value] of Object.entries(SecondLayerObjects)) {
+                linkDataArray.push({from: "{{ event_with_desired_object.name }}", to: key})
+            }
+
+            for (const [key, value] of Object.entries(ThirdLayerObjects)) {
+                for (const [k, val] of Object.entries(value)) {
+                    linkDataArray.push({from: key, to: k})
+                }
+            }
+
+            myDiagram.model =
+                $(go.GraphLinksModel, {nodeDataArray, linkDataArray})
+        }
+    </script>
+
+{% endblock %}
+
+{% block body %}
+<body onload="init()">
+
+
+<header class="p-3 mb-1 border-bottom bg-light">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center">
+        <h1 class="px-2 link-secondary text-uppercase">Wizualizacja logów</h1>
+      </div>
+    </div>
+</header>
+
+
+    <div class="container mt-3" style="min-height: 620px">
+
+        <div id="myDiagramDiv" style="width: 1290px; height: 480px; border: 1px solid black;">
+
+        </div>
+        <div>
+            <ul class="list-unstyled">
+          {% for event in events_in_graph %}
+                <li id="{{ event.name }}: {{ event.activity }}" class="event_modal bg-light rounded-4 p-3 m-3 d-none">
+                    <h4 class="bg-secondary text-white rounded-2 text-center py-1 mb-3">{{ event.name }}</h4>
+
+                    <ul>
+                    <div class="row">
+
+
+                        <div class="col-4">
+                            <li>
+                                <p><span class="fw-bold">activity</span>: {{ event.activity }}</p>
+                            </li>
+                            <li>
+                                <p><span class="fw-bold">timestamp</span>: {{ event.timestamp }}</p>
+                            </li>
+                        </div>
+                        <div class="col-4">
+                            <li>
+                                <p><span class="fw-bold">omap</span>:
+                                    <ul>
+                                    {% for object in event.event_objects.all %}
+                                        <li>{{ object.name }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </p>
+                            </li>
+                        </div>
+                        <div class="col-4">
+                            <li>
+                                <p><span class="fw-bold">vmap</span>:
+                                    <ul>
+                                    {% for key, val in event.vmap.items %}
+                                        <li><span class="fw-bolder">{{ key }}</span>: {{ val }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </p>
+                            </li>
+                        </div>
+
+                    </div>
+                    </ul>
+
+                </li>
+          {% endfor %}
+          </ul>
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+<div class="container">
+  <footer class="d-flex flex-wrap justify-content-center align-items-center py-3 mt-4 border-top">
+    <div class="d-flex align-text-center">
+        <h6 class="text-muted fw-normal">Projekt realizowany przez: Karolina Kotłowska, Jessica Sadowska</h6>
+    </div>
+  </footer>
+</div>
+
+
+<script src={% static "js/custom.js" %}></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
+</body>
+{% endblock %}
+

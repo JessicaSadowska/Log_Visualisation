@@ -1,3 +1,4 @@
+import base64
 import codecs
 
 from django.shortcuts import render
@@ -125,7 +126,7 @@ class LogsWithObjectType(View):
         return render(request, 'uploaded_logs_with_object_type.html', context)
 
 
-class Draw(View):
+class DrawTable(View):
     def get(self, request, log_id):
         log = OcelLog.objects.get(id=log_id)
         events = log.event_set.all()
@@ -150,61 +151,97 @@ class Draw(View):
         return render(request, 'draw.html', context=context)
 
 
+import json
 
 
+class DrawDependenciesOfObjects(View):
+    def get(self, request, log_id, object_id):
 
+        log = OcelLog.objects.get(id=log_id)
+        events = log.event_set.all()
+        objects = log.logobject_set.all()
+        desired_object = objects.get(id=object_id)
 
+        ordered_events = events.order_by('timestamp')
 
+        first_event_with_desired_object = None
+        events_in_graph = []
 
+        for event in ordered_events:
+            if desired_object in event.event_objects.all():
+                first_event_with_desired_object = event
+                events_in_graph.append(event)
+                break
 
+        first_layer_objects = []
+        related_objects0 = {}
+        second_layer_objects = {}
+        third_layer_objects = {}
 
+        for obj in first_event_with_desired_object.event_objects.all():
+            first_layer_objects.append(obj.name)
+            for event in ordered_events:
+                if obj in event.event_objects.all() and event.timestamp >= first_event_with_desired_object.timestamp:
+                    try:
+                        related_objects0[event.name] = [obj.name for obj in event.event_objects.all()]
+                    except:
+                        pass
 
+        ev_list = []
+        for key in related_objects0.keys():
+            e = events.get(name=key)
+            ev_list.append(e)
 
+        ev_list.sort(key=lambda x: x.timestamp, reverse=False)
 
+        related_objects = {}
+        for i in ev_list:
+            related_objects[i.name] = [obj.name for obj in i.event_objects.all()]
 
+        related_objects.pop(first_event_with_desired_object.name)
 
+        for obj in first_event_with_desired_object.event_objects.all():
+            for key, val in related_objects.items():
+                if obj.name in val and ordered_events.get(name=key).timestamp > first_event_with_desired_object.timestamp:
+                    try:
+                        ev = ordered_events.get(name=key)
+                        text = f"{ev.name}: {ev.activity}"
+                        second_layer_objects[key] = [val, text]
+                        if ordered_events.get(name=key) not in events_in_graph:
+                            events_in_graph.append(ordered_events.get(name=key))
+                        break
+                    except:
+                        pass
 
+        for key in second_layer_objects.keys():
+            related_objects.pop(key)
 
+        for key, value in second_layer_objects.items():
+            inside_layer = {}
+            for obj in value[0]:
+                for k, val in related_objects.items():
+                    if obj in val and ordered_events.get(name=key).timestamp > first_event_with_desired_object.timestamp:
+                        try:
+                            ev = ordered_events.get(name=k)
+                            text = f"{ev.name}: {ev.activity}"
+                            inside_layer[k+key] = [val, text]
+                            if ordered_events.get(name=k) not in events_in_graph:
+                                events_in_graph.append(ordered_events.get(name=k))
+                            break
+                        except:
+                            pass
+            third_layer_objects[key] = inside_layer
 
-    # def get_events_with_objects(request):
-    #     if request.method == 'POST':
-    #         form = ObjectForm(request.POST)
-    #         objects = "sdf"
-    #     else:
-    #         form = ObjectForm()
+        first_layer_objects_json = json.dumps(first_layer_objects)
+        second_layer_objects_json = json.dumps(second_layer_objects)
+        third_layer_objects_json = json.dumps(third_layer_objects)
 
-    #     return render(request, 'uploaded.html', {'form': form, 'objects': objects})
+        context = {
+            "event_with_desired_object": first_event_with_desired_object,
+            "first_layer_objects": first_layer_objects_json,
+            "second_layer_objects": second_layer_objects_json,
+            "third_layer_objects": third_layer_objects_json,
+            "events_in_graph": events_in_graph
+        }
 
-# class OcelLog:
-#     def __init__(self, log):
-#         self.log = log
-#
-#     def get_events(self):
-#         return ocel.get_events(self.log)
-#
-#     def get_events_names_string(self):
-#         events = ocel.get_events(self.log)
-#         return ', ' .join(list(events.keys()))
-#
-#     def get_events_names_array(self):
-#         events = ocel.get_events(self.log)
-#         return list(events.keys())
-#
-#     def get_objects(self):
-#         return ocel.get_objects(self.log)
-#
-#     def objects_count(self):
-#         return len(ocel.get_objects(self.log))
-#
-#     def my_filtering_function(pair):
-#         pass
-#         # unwanted_key = 'Matt'
-#         # key, value = pair
-#         # if key == unwanted_key:
-#         #     return False
-#         # else:
-#         #     return True
-#
-#     def get_events_with_objects(self):
-#         pass
-#
+        return render(request, 'draw_dependencies.html', context=context)
