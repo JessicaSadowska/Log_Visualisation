@@ -15,6 +15,7 @@
     var objects_string = ["{% for event in events %}{% for object in event.event_objects.all %}-{{ object.name }}-{% endfor %},{% endfor %}"];
     var objects_array = objects_string[0].split(',');
 
+
     var activity_in_event = ["{% for event in events %} {{ event.activity}} ,{% endfor %}"];
     var activities_array = activity_in_event[0].split(',');
 
