@@ -16,6 +16,9 @@ class LogObject(models.Model):
     type = models.CharField(max_length=255)
     ovmap = models.TextField(null=True)
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 class Event(models.Model):
     ocel_log = models.ForeignKey(OcelLog, on_delete=models.CASCADE)
@@ -25,5 +28,6 @@ class Event(models.Model):
     event_objects = models.ManyToManyField(LogObject, related_name="events")
     vmap = models.JSONField(null=True)
 
-
+    def __str__(self):
+        return f"{self.name}"
 

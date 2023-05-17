@@ -3,12 +3,20 @@
 {% block content %}
 
     <div class="container mt-5" style="min-height: 590px">
-        <form action="{% url 'Home' %}" method="POST" enctype="multipart/form-data" id="inputform" name="form1" class="dropzone">
-            {% csrf_token %}
-            <h4>Wybierz plik w formacie 'jsonocel', który chcesz załadować:</h4>
-            <input type="file" name="uploaded_file">
-            <button class="btn btn-light" type="submit" id="add">Zatwierdź</button>
-        </form>
+        <div class="modal-dialog mb-4" role="document" style="width: 700px">
+        <div class="modal-content rounded-4 shadow" style="background-color: #ced4da; height: 320px; width: 700px">
+          <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
+            <form action="{% url 'Home' %}" method="POST" enctype="multipart/form-data" id="inputform" name="form1" class="dropzone">
+                {% csrf_token %}
+                <h4 class="my-5">Wybierz plik w formacie 'jsonocel', który chcesz załadować:</h4>
+                <input type="file" name="uploaded_file" style="margin-left: 200px"><br>
+                <button class="btn btn-light my-4" type="submit" id="add" style="width: 235px; margin-left: 200px">Zatwierdź</button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
+
+
 
 {% endblock %}

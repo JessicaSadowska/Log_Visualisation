@@ -1,8 +1,29 @@
 {% extends "home.html" %}
 {% load static %}
 {% block content %}
+<nav class="navbar navbar-expand-lg navbar-light rounded border-bottom">
+    <div class="collapse navbar-collapse justify-content-md-center" id="navbarsExample10">
+      <ul class="navbar-nav">
+        <li class="nav-item active mx-3 text-uppercase">
+          <a class="nav-link" href="/">Załaduj</a>
+        </li>
+        <li class="nav-item active mx-3 text-uppercase">
+          <a class="nav-link" href="{% url 'Search' log.id %}">Wyszukaj</a>
+        </li>
+        <li class="nav-item active mx-3 text-uppercase">
+          <a class="nav-link" href="{% url 'ListOfEvents' log.id %}">Lista eventów</a>
+        </li>
+        <li class="nav-item active mx-3 text-uppercase">
+          <a class="nav-link" href="{% url 'Graphs' log.id %}">Grafy</a>
+        </li>
+        <li class="nav-item active mx-3 text-uppercase">
+          <a class="nav-link" href="{% url 'Statistics' log.id %}">Statystki</a>
+        </li>
+      </ul>
+    </div>
+</nav>
 
-    <div class="container mt-5" style="min-height: 590px">
+    <div class="container mt-5" style="min-height: 538px">
         <h3 class="text-uppercase fw-normal text-dark">Z obiektem typu <span class="fw-bold">{{ object_type }}</span> znaleziono:</h3>
         <h4 class="text-uppercase my-3">Obiekty:</h4>
         <ul class="mb-4">
@@ -11,6 +32,7 @@
             {% endfor %}
         </ul>
 
+        <h4 class="text-uppercase my-3">Eventy:</h4>
           <ul class="list-unstyled">
           {% for event in events %}
                 <li class="bg-light rounded-4 p-3 m-3">
