@@ -21,14 +21,22 @@
             </div>
         </div>
 
-        <div class="col-9 px-3">
+        <div class="col-3 px-3">
+
+            <h3 class="text-uppercase fw-normal text-dark">Wybierz event:</h3>
 
 
-
-
-
-
-
+              <div class="modal-dialog mb-4" role="document">
+                <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
+                  <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
+                    {% for event in events %}
+                        <a href="{% url 'DrawAnotherDependencies' log.id event.name %}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">
+                            {{ event.name }}
+                        </a>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
         </div>
 
 
@@ -40,9 +48,9 @@
 {#------------------------------DRAW TABLE---------------------------------#}
 
 
-    <div class="d-flex my-5 justify-content-center">
-        <a href="{% url 'DrawTable' log.id %}" class="btn btn-secondary text-uppercase fw-normal mt-4" style="width: 200px">Tabelka</a>
-    </div>
+{#    <div class="d-flex my-5 justify-content-center">#}
+{#        <a href="{% url 'DrawTable' log.id %}" class="btn btn-secondary text-uppercase fw-normal mt-4" style="width: 200px">Tabelka</a>#}
+{#    </div>#}
 
 
 {#------------------------------//DRAW TABLE---------------------------------#}

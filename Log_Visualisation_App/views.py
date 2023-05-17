@@ -305,6 +305,7 @@ class DrawDependenciesOfObjects(View):
             "events_in_graph": events_in_graph,
             "log": log,
             "objects": objects,
+            "events": events,
         }
 
         return render(request, 'draw_dependencies.html', context=context)
@@ -405,6 +406,7 @@ class DrawAnotherDependencies(View):
             "events_in_graph": events_in_graph,
             "log": log,
             "objects": objects,
+            "events": events,
         }
 
         return render(request, 'draw_dependencies.html', context=context)
