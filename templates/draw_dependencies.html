@@ -107,10 +107,13 @@
                 for (const [k, val] of Object.entries(value)) {
                     if (!(doesGroupAlreadyExist(val[1]))){
                         for (const v of val[0]) {
-                            nodeDataArray.push({key: v + k, text: v, group: k});
+                            nodeDataArray.push({key: v + k, text: v, group: val[1]});
                             }
-                        nodeDataArray.push({key: k, text: val[1], isGroup: true});
+                        nodeDataArray.push({key: val[1], text: val[1], isGroup: true});
                         }
+                    else {
+                        nodeDataArray.push({key: val[1], text: val[1], isGroup: true});
+                    }
                     }
                 }
 
@@ -122,7 +125,7 @@
 
             for (const [key, value] of Object.entries(ThirdLayerObjects)) {
                 for (const [k, val] of Object.entries(value)) {
-                    linkDataArray.push({from: key, to: k, text:val[2]})
+                    linkDataArray.push({from: key, to: val[1], text:val[2]})
                 }
             }
 
