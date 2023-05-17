@@ -68,63 +68,51 @@
                   }
                 });
 
-            var nodeDataArray = []
+                var nodeDataArray = [];
+                var linkDataArray = [];
 
-            const FirstLayerObjects = {{ first_layer_objects|safe }}
+                const FirstLayerObjects = {{ first_layer_objects|safe }};
+                const SecondLayerObjects = {{ second_layer_objects|safe }};
+                const ThirdLayerObjects = {{ third_layer_objects|safe }};
 
-            for (const o of FirstLayerObjects ){
-                  nodeDataArray.push({key: o, text: o, group:"{{event_with_desired_object.name}}"});
-                }
-            nodeDataArray.push({key: "{{event_with_desired_object.name}}", text: "{{event_with_desired_object.name}}: {{event_with_desired_object.activity}}", isGroup: true});
-
-            const SecondLayerObjects = {{ second_layer_objects|safe }}
-
-            for (const [key, value] of Object.entries(SecondLayerObjects)) {
-                for (const val of value[0]) {
-                    nodeDataArray.push({key: val+key, text: val, group: key});
-                    }
-                nodeDataArray.push({key: key, text: value[1], isGroup: true});
-                }
-
-            const ThirdLayerObjects = {{ third_layer_objects|safe }}
-            console.log(ThirdLayerObjects)
-
-            function doesGroupAlreadyExist(group_text) {
-                let check = false
-                nodeDataArray.forEach((node) => {
-                    if (node.isGroup === true){
-                        if (node.text === group_text) {
-                            check = true
-                        }
-                    }
+                FirstLayerObjects.forEach(o => {
+                    nodeDataArray.push({ key: o, text: o, group: "{{event_with_desired_object.name}}" });
                 });
-                return check
-            }
+                nodeDataArray.push({ key: "{{event_with_desired_object.name}}", text: "{{event_with_desired_object.name}}: {{event_with_desired_object.activity}}", isGroup: true });
 
+                Object.entries(SecondLayerObjects).forEach(([key, value]) => {
+                    value[0].forEach(val => {
+                    const nodeKey = val + key;
+                    nodeDataArray.push({ key: nodeKey, text: val, group: key });
+                    });
+                    nodeDataArray.push({ key: key, text: value[1], isGroup: true });
+                });
 
+                function doesGroupAlreadyExist(group_text) {
+                    return nodeDataArray.some(node => node.isGroup && node.text === group_text);
+                }
 
-            for (const [key, value] of Object.entries(ThirdLayerObjects)) {
-                for (const [k, val] of Object.entries(value)) {
-                    if (!(doesGroupAlreadyExist(val[1]))){
-                        for (const v of val[0]) {
-                            nodeDataArray.push({key: v + k, text: v, group: val[1]});
-                            }
-                        nodeDataArray.push({key: val[1], text: val[1], isGroup: true});
-                        }
+                Object.entries(ThirdLayerObjects).forEach(([key, value]) => {
+                    Object.entries(value).forEach(([k, val]) => {
+                    if (!doesGroupAlreadyExist(val[1])) {
+                        val[0].forEach(v => {
+                        const nodeKey = v + k;
+                        nodeDataArray.push({ key: nodeKey, text: v, group: val[1] });
+                        });
+                        nodeDataArray.push({ key: val[1], text: val[1], isGroup: true });
                     }
-                }
+                    });
+                });
 
-            var linkDataArray = []
+                Object.entries(SecondLayerObjects).forEach(([key, value]) => {
+                    linkDataArray.push({ from: "{{ event_with_desired_object.name }}", to: key, text: value[2] });
+                });
 
-            for (const [key, value] of Object.entries(SecondLayerObjects)) {
-                linkDataArray.push({from: "{{ event_with_desired_object.name }}", to: key, text:value[2]})
-            }
-
-            for (const [key, value] of Object.entries(ThirdLayerObjects)) {
-                for (const [k, val] of Object.entries(value)) {
-                    linkDataArray.push({from: key, to: val[1], text:val[2]})
-                }
-            }
+                Object.entries(ThirdLayerObjects).forEach(([key, value]) => {
+                    Object.entries(value).forEach(([k, val]) => {
+                    linkDataArray.push({ from: key, to: val[1], text: val[2] });
+                    });
+                });
 
             myDiagram.model =
                 $(go.GraphLinksModel, {nodeDataArray, linkDataArray})
