@@ -297,6 +297,94 @@ class DrawDependenciesOfObjects(View):
         return render(request, 'draw_dependencies.html', context=context)
 
 
+class DrawAnotherDependencies(View):
+    def get(self, request, log_id, event_name):
+
+        log = OcelLog.objects.get(id=log_id)
+        events = log.event_set.all()
+        objects = log.logobject_set.all()
+
+        ordered_events = events.order_by('timestamp')
+
+        first_event_with_desired_object = log.event_set.all().get(name=event_name)
+        events_in_graph = []
+
+        first_layer_objects = []
+        related_objects0 = {}
+        second_layer_objects = {}
+        third_layer_objects = {}
+
+        for obj in first_event_with_desired_object.event_objects.all():
+            first_layer_objects.append(obj.name)
+            for event in ordered_events:
+                if obj in event.event_objects.all() and event.timestamp >= first_event_with_desired_object.timestamp:
+                    try:
+                        related_objects0[event.name] = [obj.name for obj in event.event_objects.all()]
+                    except:
+                        pass
+
+        ev_list = []
+        for key in related_objects0.keys():
+            e = events.get(name=key)
+            ev_list.append(e)
+
+        ev_list.sort(key=lambda x: x.timestamp, reverse=False)
+
+        related_objects = {}
+        for i in ev_list:
+            related_objects[i.name] = [obj.name for obj in i.event_objects.all()]
+
+        related_objects.pop(first_event_with_desired_object.name)
+
+        for obj in first_event_with_desired_object.event_objects.all():
+            for key, val in related_objects.items():
+                if obj.name in val and ordered_events.get(name=key).timestamp > first_event_with_desired_object.timestamp:
+                    try:
+                        ev = ordered_events.get(name=key)
+                        text = f"{ev.name}: {ev.activity}"
+                        second_layer_objects[key] = [val, text]
+                        if ordered_events.get(name=key) not in events_in_graph:
+                            events_in_graph.append(ordered_events.get(name=key))
+                        break
+                    except:
+                        pass
+
+        for key in second_layer_objects.keys():
+            related_objects.pop(key)
+
+        for key, value in second_layer_objects.items():
+            inside_layer = {}
+            for obj in value[0]:
+                for k, val in related_objects.items():
+                    if obj in val and ordered_events.get(name=key).timestamp > first_event_with_desired_object.timestamp:
+                        try:
+                            ev = ordered_events.get(name=k)
+                            text = f"{ev.name}: {ev.activity}"
+                            inside_layer[k+key] = [val, text]
+                            if ordered_events.get(name=k) not in events_in_graph:
+                                events_in_graph.append(ordered_events.get(name=k))
+                            break
+                        except:
+                            pass
+            third_layer_objects[key] = inside_layer
+
+        first_layer_objects_json = json.dumps(first_layer_objects)
+        second_layer_objects_json = json.dumps(second_layer_objects)
+        third_layer_objects_json = json.dumps(third_layer_objects)
+
+        context = {
+            "event_with_desired_object": first_event_with_desired_object,
+            "first_layer_objects": first_layer_objects_json,
+            "second_layer_objects": second_layer_objects_json,
+            "third_layer_objects": third_layer_objects_json,
+            "events_in_graph": events_in_graph,
+            "log": log,
+            "objects": objects,
+        }
+
+        return render(request, 'draw_dependencies.html', context=context)
+
+
 class Statistics(View):
     def get(self, request, log_id):
         log = OcelLog.objects.get(id=log_id)

@@ -34,11 +34,26 @@
                 modal.classList.add('d-block');
                 }
 
+
+            function redirectFunction(log_id, event_name) {
+                  window.location.href = '/draw-another-dependencies/'+log_id+'/'+event_name+'/';
+               }
+
             myDiagram.addDiagramListener("ObjectSingleClicked",
                 e => {
                   var part = e.subject.part;
                   if (!(part instanceof go.Link)) {
                       showModal(part.data.text);
+                  }
+                });
+
+            myDiagram.addDiagramListener("ObjectDoubleClicked",
+                e => {
+                  var part = e.subject.part;
+                  if (!(part instanceof go.Link)) {
+                      showModal(part.data.text);
+                      const event_name = part.data.text.substring(0, part.data.text.indexOf(":"));
+                      redirectFunction("{{ log.id }}", event_name)
                   }
                 });
 

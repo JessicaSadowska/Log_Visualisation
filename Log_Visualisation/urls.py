@@ -14,6 +14,7 @@ urlpatterns = [
     path('logs-with-object-type/<int:log_id>/<str:object_type>/', LogsWithObjectType.as_view(), name='LogsWithObjectType'),
     path('draw-table/<int:log_id>/', DrawTable.as_view(), name='DrawTable'),
     path('draw-dependencies-of-objects/<int:log_id>/<int:object_id>/', DrawDependenciesOfObjects.as_view(), name='DrawDependenciesOfObjects'),
+    path('draw-another-dependencies/<int:log_id>/<str:event_name>/', DrawAnotherDependencies.as_view(), name='DrawAnotherDependencies'),
     path('statistics/<int:log_id>/', Statistics.as_view(), name='Statistics'),
     path('graphs/<int:log_id>/', Graphs.as_view(), name='Graphs'),
     path('graphs-uploaded/<int:log_id>/<int:object_id>/', GraphsUploaded.as_view(), name='GraphsUploaded'),
