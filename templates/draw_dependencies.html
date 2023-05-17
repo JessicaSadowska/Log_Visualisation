@@ -15,6 +15,17 @@
                     )
                 );
 
+            myDiagram.linkTemplate =
+              $(go.Link,
+                $(go.Shape),
+                $(go.Shape, { toArrow: "Standard" }),
+                $(go.Panel, "Auto",  // this whole Panel is a link label
+                  $(go.Shape, "RoundedRectangle", { fill: "lightblue", stroke: "gray" }),
+                  $(go.TextBlock, { margin: 3 },
+                    new go.Binding("text", "text"))
+                )
+              );
+
 
             myDiagram.layout =
                 $(go.TreeLayout,
@@ -78,24 +89,40 @@
             const ThirdLayerObjects = {{ third_layer_objects|safe }}
             console.log(ThirdLayerObjects)
 
+            function doesGroupAlreadyExist(group_text) {
+                let check = false
+                nodeDataArray.forEach((node) => {
+                    if (node.isGroup === true){
+                        if (node.text === group_text) {
+                            check = true
+                        }
+                    }
+                });
+                return check
+            }
+
+
+
             for (const [key, value] of Object.entries(ThirdLayerObjects)) {
                 for (const [k, val] of Object.entries(value)) {
-                    for (const v of val[0]) {
-                        nodeDataArray.push({key: v + k, text: v, group: k});
+                    if (!(doesGroupAlreadyExist(val[1]))){
+                        for (const v of val[0]) {
+                            nodeDataArray.push({key: v + k, text: v, group: k});
+                            }
+                        nodeDataArray.push({key: k, text: val[1], isGroup: true});
                         }
-                    nodeDataArray.push({key: k, text: val[1], isGroup: true});
                     }
                 }
 
             var linkDataArray = []
 
             for (const [key, value] of Object.entries(SecondLayerObjects)) {
-                linkDataArray.push({from: "{{ event_with_desired_object.name }}", to: key})
+                linkDataArray.push({from: "{{ event_with_desired_object.name }}", to: key, text:value[2]})
             }
 
             for (const [key, value] of Object.entries(ThirdLayerObjects)) {
                 for (const [k, val] of Object.entries(value)) {
-                    linkDataArray.push({from: key, to: k})
+                    linkDataArray.push({from: key, to: k, text:val[2]})
                 }
             }
 

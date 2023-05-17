@@ -249,12 +249,17 @@ class DrawDependenciesOfObjects(View):
         related_objects.pop(first_event_with_desired_object.name)
 
         for obj in first_event_with_desired_object.event_objects.all():
+            objects_on_arrow = [obj.name]
             for key, val in related_objects.items():
-                if obj.name in val and ordered_events.get(name=key).timestamp > first_event_with_desired_object.timestamp:
+                if obj.name in val and ordered_events.get(
+                        name=key).timestamp > first_event_with_desired_object.timestamp:
                     try:
                         ev = ordered_events.get(name=key)
                         text = f"{ev.name}: {ev.activity}"
-                        second_layer_objects[key] = [val, text]
+                        if key not in second_layer_objects.keys():
+                            second_layer_objects[key] = [val, text, objects_on_arrow]
+                        else:
+                            second_layer_objects[key][2].append(obj.name)
                         if ordered_events.get(name=key) not in events_in_graph:
                             events_in_graph.append(ordered_events.get(name=key))
                         break
@@ -268,11 +273,19 @@ class DrawDependenciesOfObjects(View):
             inside_layer = {}
             for obj in value[0]:
                 for k, val in related_objects.items():
-                    if obj in val and ordered_events.get(name=key).timestamp > first_event_with_desired_object.timestamp:
+                    if obj in val and ordered_events.get(
+                            name=key).timestamp > first_event_with_desired_object.timestamp:
                         try:
                             ev = ordered_events.get(name=k)
                             text = f"{ev.name}: {ev.activity}"
-                            inside_layer[k+key] = [val, text]
+                            objects_on_arrow = [obj]
+                            if k + key not in inside_layer.keys():
+                                inside_layer[k + key] = [val, text, objects_on_arrow]
+                            else:
+                                inside_layer[k + key][2].append(obj)
+
+                            print(f"THIRD LAYER KEY: {k + key}")
+                            print(f"THIRD LAYER KEY: {inside_layer[k + key]}")
                             if ordered_events.get(name=k) not in events_in_graph:
                                 events_in_graph.append(ordered_events.get(name=k))
                             break
@@ -308,6 +321,7 @@ class DrawAnotherDependencies(View):
 
         first_event_with_desired_object = log.event_set.all().get(name=event_name)
         events_in_graph = []
+        events_in_graph.append(first_event_with_desired_object)
 
         first_layer_objects = []
         related_objects0 = {}
@@ -337,12 +351,16 @@ class DrawAnotherDependencies(View):
         related_objects.pop(first_event_with_desired_object.name)
 
         for obj in first_event_with_desired_object.event_objects.all():
+            objects_on_arrow = [obj.name]
             for key, val in related_objects.items():
                 if obj.name in val and ordered_events.get(name=key).timestamp > first_event_with_desired_object.timestamp:
                     try:
                         ev = ordered_events.get(name=key)
                         text = f"{ev.name}: {ev.activity}"
-                        second_layer_objects[key] = [val, text]
+                        if key not in second_layer_objects.keys():
+                            second_layer_objects[key] = [val, text, objects_on_arrow]
+                        else:
+                            second_layer_objects[key][2].append(obj.name)
                         if ordered_events.get(name=key) not in events_in_graph:
                             events_in_graph.append(ordered_events.get(name=key))
                         break
@@ -360,7 +378,14 @@ class DrawAnotherDependencies(View):
                         try:
                             ev = ordered_events.get(name=k)
                             text = f"{ev.name}: {ev.activity}"
-                            inside_layer[k+key] = [val, text]
+                            objects_on_arrow = [obj]
+                            if k+key not in inside_layer.keys():
+                                inside_layer[k+key] = [val, text, objects_on_arrow]
+                            else:
+                                inside_layer[k+key][2].append(obj)
+
+                            print(f"THIRD LAYER KEY: {k+key}")
+                            print(f"THIRD LAYER KEY: {inside_layer[k+key]}")
                             if ordered_events.get(name=k) not in events_in_graph:
                                 events_in_graph.append(ordered_events.get(name=k))
                             break
