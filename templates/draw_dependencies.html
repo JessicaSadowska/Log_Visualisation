@@ -160,11 +160,11 @@
         <div class="row">
 
         <div class="col-3 px-3">
-            <h3 class="text-uppercase fw-normal text-dark">Wybierz obiekt:</h3>
+            <h4 class="text-uppercase fw-normal text-dark">Wybierz obiekt:</h4>
 
             <div class="modal-dialog mb-4" role="document">
                 <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
-                      <div class="modal-body m-4" style="overflow-y: auto; max-height: 350px">
+                      <div class="modal-body m-4" style="overflow-y: auto; max-height: 200px">
                         {% for object in objects %}
                             <a href="{% url 'DrawDependenciesOfObjects' log.id object.id %}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">
                                 {{ object.name }}
@@ -173,6 +173,22 @@
                       </div>
                 </div>
             </div>
+
+            <h4 class="text-uppercase fw-normal text-dark">Wybierz event:</h4>
+
+
+              <div class="modal-dialog mb-4" role="document">
+                <div class="modal-content rounded-4 shadow" style="background-color: #ced4da">
+                  <div class="modal-body m-4" style="overflow-y: auto; max-height: 200px">
+                    {% for event in events %}
+                        <a href="{% url 'DrawAnotherDependencies' log.id event.name %}" class="btn btn-light my-1 py-2 fw-bold text-dark" style="width: 100%; text-align: center">
+                            {{ event.name }}
+                        </a>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
         </div>
 
         <div class="col-9 px-3">
